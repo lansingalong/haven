@@ -470,11 +470,31 @@ const MEMBER_DETAIL_TERMS = [
   'member overview', 'basic info', 'basic information',
 ]
 
+const RISK_TERMS = [
+  'risk level', 'risk score', 'risk tier', 'risk stratif', 'risk rating',
+  'risk', 'high risk', 'low risk', 'moderate risk',
+  'readmission risk', 'hospitalization risk', 'ed risk',
+  'how at risk', 'what is the risk', 'what is their risk', 'what is his risk', 'what is her risk',
+  "what's the risk", 'acuity', 'acuity level', 'complexity',
+  'predictive', 'utilization risk',
+]
+
+const HEALTH_INDICATOR_TERMS = [
+  'health indicator', 'health indicators', 'last recorded',
+  'last health', 'latest health', 'most recent health',
+  'key indicator', 'key indicators', 'key metric', 'key metrics',
+  'clinical indicator', 'clinical indicators', 'clinical summary',
+  'summary of health', 'health summary', 'health snapshot',
+  'bnp', 'hemoglobin', 'recorded indicator',
+]
+
 /* ─── Follow-up suggestions ─────────────────────────────────────────────────── */
 
 export function getFollowUp(input: string): string {
   const q = input.toLowerCase()
 
+  if (matches(q, RISK_TERMS))              return "Would you like to see the member's last recorded health indicators?"
+  if (matches(q, HEALTH_INDICATOR_TERMS))  return "Would you like to see the member's current risk level?"
   if (matches(q, ALLERGY_TERMS))         return "Would you like to review the current medication list for contraindications?"
   if (matches(q, VITAL_TERMS))           return "Would you like to see the most recent lab results?"
   if (matches(q, LAB_TERMS))             return "Would you like to see the open care gaps related to these values?"
@@ -624,6 +644,14 @@ function getMemberDetailReply(first: string): string {
   return `${first}'s member details:\n\n• Full name: ${mockMemberDetail.memberFirstName} ${mockMemberDetail.memberMiddleName} ${mockMemberDetail.memberLastName}\n• DOB: ${mockMemberDetail.dateOfBirth} · Gender: ${mockMemberDetail.gender} · Pronouns: ${mockMemberDetail.preferredPronouns}\n• Primary language: ${mockMemberDetail.primaryLanguage}\n• Preferred written language: ${mockMemberDetail.preferredWrittenLanguages.join(', ')}\n• Address: ${addr?.address1 ?? 'N/A'}, ${addr?.city}, ${addr?.state} ${addr?.zip}\n• Assigned care manager: ${mockMemberDetail.assignedCareManager}\n• Status: ${mockMemberDetail.status} · Enrollment: ${mockMemberDetail.enrollment}\n• Ethnicity: ${mockMemberDetail.ethnicity.join(', ')} · Marital status: ${mockMemberDetail.maritalStatus}`
 }
 
+function getRiskReply(first: string): string {
+  return `${first}'s current risk level: Moderate-High\n\nRisk stratification (2024):\n• Overall risk tier: Tier 3 — Moderate-High\n• Primary drivers:\n  - Uncontrolled Type 2 Diabetes (A1C 7.8%, above goal)\n  - Essential Hypertension (BP 138/88, above target)\n  - CKD Stage G2 (eGFR 74 — monitor for progression)\n  - Hyperlipidemia (LDL 112 mg/dL — borderline high)\n• 30-day readmission risk: Low\n• 12-month hospitalization risk: Moderate\n• Last risk assessment: HRA score 68/100 (02/2024)\n\nRisk is elevated primarily due to multiple uncontrolled chronic conditions. Recommend prioritizing medication adherence and dietary interventions at next outreach.`
+}
+
+function getHealthIndicatorReply(first: string): string {
+  return `${first}'s last recorded health indicators (02/01/2024):\n\nKey clinical values:\n• HbA1c: 7.8% ⚠️ — above goal (<7.0%), trending up from 7.2% (Aug 2023)\n• Blood Pressure: 138/88 mmHg — mildly elevated\n• eGFR: 74 mL/min/1.73m² — Stage G2 CKD, stable\n• Weight: 192 lbs | BMI: 28.4 — overweight range\n• O₂ Saturation: 98% — within normal limits\n• LDL Cholesterol: 112 mg/dL — borderline high\n\nMost concerning indicator: rising HbA1c trend (+0.6% over 6 months). Recommend medication adherence review and dietary consultation at next contact.`
+}
+
 /* ─── Lisa Thompson reply functions ─────────────────────────────────────────── */
 
 function getLisaMedReply(first: string): string {
@@ -751,7 +779,17 @@ function getLisaMemberDetailReply(first: string): string {
   return `${first}'s member details:\n\n• Full name: ${lisaMemberDetail.memberFirstName} ${lisaMemberDetail.memberMiddleName} ${lisaMemberDetail.memberLastName}\n• DOB: ${lisaMemberDetail.dateOfBirth} · Gender: ${lisaMemberDetail.gender} · Pronouns: ${lisaMemberDetail.preferredPronouns}\n• Primary language: ${lisaMemberDetail.primaryLanguage}\n• Preferred written language: ${lisaMemberDetail.preferredWrittenLanguages.join(', ')}\n• Address: ${addr?.address1 ?? 'N/A'}, ${addr?.city}, ${addr?.state} ${addr?.zip}\n• Assigned care manager: ${lisaMemberDetail.assignedCareManager}\n• Status: ${lisaMemberDetail.status} · Enrollment: ${lisaMemberDetail.enrollment}\n• Ethnicity: ${lisaMemberDetail.ethnicity.join(', ')} · Marital status: ${lisaMemberDetail.maritalStatus}`
 }
 
+function getLisaRiskReply(first: string): string {
+  return `${first}'s current risk level: High\n\nRisk stratification (2024):\n• Overall risk tier: Tier 4 — High\n• Primary drivers:\n  - Recent CHF hospitalization (12/2023 — 3-day inpatient stay)\n  - COPD with below-goal O₂ saturation (94% on room air)\n  - Uncontrolled Type 2 Diabetes (A1C 8.2%, above goal)\n  - CKD Stage 3 (eGFR 45 — moderate impairment)\n  - Social isolation (widowed, lives alone)\n• 30-day CHF readmission risk: High ⚠️\n• 12-month hospitalization risk: High\n• Last risk assessment: HRA score 85/100 (03/2024)\n\nMember is high-priority for proactive outreach. CHF readmission prevention is the primary care plan focus — monitor daily weight and fluid intake closely.`
+}
+
+function getLisaHealthIndicatorReply(first: string): string {
+  return `${first}'s last recorded health indicators (03/10/2024):\n\nKey clinical values:\n• BNP: 420 pg/mL ⚠️ — elevated, consistent with active CHF\n• O₂ Saturation: 94% ⚠️ — below goal (≥96%), monitor for COPD exacerbation\n• Blood Pressure: 152/94 mmHg ⚠️ — above target (<130/80)\n• Weight: 167 lbs — up 3 lbs from last visit (fluid retention risk)\n• HbA1c: 8.2% ⚠️ — above goal (<7.5%), trending up\n• eGFR: 45 mL/min/1.73m² — CKD Stage 3, stable but requires monitoring\n\nMost concerning indicator: elevated BNP combined with weight gain — early signs of possible CHF decompensation. Recommend daily weight check reminder and fluid restriction education at next contact.`
+}
+
 function getLisaReply(q: string, first: string): string {
+  if (matches(q, RISK_TERMS)) return getLisaRiskReply(first)
+  if (matches(q, HEALTH_INDICATOR_TERMS)) return getLisaHealthIndicatorReply(first)
   if (matches(q, ALLERGY_TERMS)) return getLisaAllergyReply(first)
   if (matches(q, VITAL_TERMS)) return getLisaVitalReply(first)
   if (matches(q, LAB_TERMS)) return getLisaLabReply(first)
@@ -778,6 +816,12 @@ export function getMockReply(input: string, memberName: string, memberId = 'AH00
   const first = memberName.split(' ')[0]
 
   if (memberId === 'AH0000023') return getLisaReply(q, first)
+
+  // Risk level
+  if (matches(q, RISK_TERMS)) return getRiskReply(first)
+
+  // Health indicators
+  if (matches(q, HEALTH_INDICATOR_TERMS)) return getHealthIndicatorReply(first)
 
   // Allergies — check before medications to avoid false positives
   if (matches(q, ALLERGY_TERMS)) return getAllergyReply(first)

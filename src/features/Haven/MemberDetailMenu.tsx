@@ -1,10 +1,10 @@
 import styles from './MemberDetailMenu.module.css'
 
 const PROMPTS = [
-  "What is on the member's medication list?",
-  'What services is the member eligible for?',
-  'When is the best time to contact the member?',
-  "When does the member's eligibility end?",
+  "What is this member's current risk level?",
+  "What is this member's last recorded health indicator?",
+  "What services is this member eligible for?",
+  "What is this member's current medication list?",
 ]
 
 export interface MemberDetailMenuProps {
