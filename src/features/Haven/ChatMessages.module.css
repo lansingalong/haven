@@ -123,6 +123,38 @@
   line-height: var(--line-height-body);
 }
 
+/* ── Follow-up suggestions ── */
+.followUps {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 8px;
+  margin-bottom: 2px;
+}
+
+.followUpChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  background: var(--color-bg-default);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-secondary);
+  text-align: left;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.followUpChip:hover {
+  background: var(--color-action-hover);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
 /* ── Thinking steps ── */
 .thinkingWrap {
   display: flex;

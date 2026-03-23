@@ -7,7 +7,7 @@ import { ChatMessages, type Message } from './ChatMessages'
 import { AskHavenInput } from './AskHavenInput'
 import styles from './HavenWindow.module.css'
 import panelStyles from './HavenPanel.module.css'
-import { getMockReply } from './mockReplies'
+import { getMockReply, getFollowUps } from './mockReplies'
 
 export interface HavenWindowProps {
   memberName?: string
@@ -163,7 +163,12 @@ export function HavenWindow({
         await new Promise(r => setTimeout(r, 1000 + Math.random() * 800))
         reply = getMockReply(trimmed, memberName, mockMemberId)
       }
-      setMessages(prev => [...prev, { id: `a-${Date.now()}`, role: 'assistant', content: reply }])
+      setMessages(prev => [...prev, {
+        id: `a-${Date.now()}`,
+        role: 'assistant',
+        content: reply,
+        followUps: getFollowUps(trimmed),
+      }])
     } finally {
       setLoading(false)
     }
@@ -301,7 +306,7 @@ export function HavenWindow({
             {/* Scroll area */}
             <div className={panelStyles.chatScroll}>
               {hasMessages ? (
-                <ChatMessages messages={messages} loading={loading} />
+                <ChatMessages messages={messages} loading={loading} onFollowUp={sendMessage} />
               ) : (
                 <div className={panelStyles.welcomeWrap}>
                   <ChatWelcome onMemberDetails={() => setMenuOpen(true)} />

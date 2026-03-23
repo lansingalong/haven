@@ -8,6 +8,7 @@ export interface Message {
   content: string
   isError?: boolean
   feedback?: 'up' | 'down' | null
+  followUps?: string[]
 }
 
 export interface ChatMessagesProps {
@@ -17,6 +18,7 @@ export interface ChatMessagesProps {
   /** Show animated thinking steps before response */
   thinkingSteps?: string[] | null
   onFeedback?: (id: string, value: 'up' | 'down') => void
+  onFollowUp?: (text: string) => void
 }
 
 /* ── Thinking steps ── */
@@ -61,7 +63,17 @@ function TypingIndicator() {
 }
 
 /* ── Assistant message with actions ── */
-function AssistantMessage({ msg, onFeedback }: { msg: Message; onFeedback?: (id: string, value: 'up' | 'down') => void }) {
+function AssistantMessage({
+  msg,
+  showFollowUps,
+  onFeedback,
+  onFollowUp,
+}: {
+  msg: Message
+  showFollowUps: boolean
+  onFeedback?: (id: string, value: 'up' | 'down') => void
+  onFollowUp?: (text: string) => void
+}) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -89,6 +101,21 @@ function AssistantMessage({ msg, onFeedback }: { msg: Message; onFeedback?: (id:
       <div className={styles.row}>
         <div className={styles.assistantBubble}>{msg.content}</div>
       </div>
+      {showFollowUps && msg.followUps && msg.followUps.length > 0 && (
+        <div className={styles.followUps}>
+          {msg.followUps.map(q => (
+            <button
+              key={q}
+              type="button"
+              className={styles.followUpChip}
+              onClick={() => onFollowUp?.(q)}
+            >
+              <Icon name="ArrowForward" size="xs" color="action" />
+              <span>{q}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div className={styles.actions}>
         <button
           className={`${styles.actionBtn} ${copied ? styles.actionBtnActive : ''}`}
@@ -125,12 +152,14 @@ function AssistantMessage({ msg, onFeedback }: { msg: Message; onFeedback?: (id:
 }
 
 /* ── Main component ── */
-export function ChatMessages({ messages, loading, thinkingSteps, onFeedback }: ChatMessagesProps) {
+export function ChatMessages({ messages, loading, thinkingSteps, onFeedback, onFollowUp }: ChatMessagesProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading, thinkingSteps])
+
+  const lastAssistantId = [...messages].reverse().find(m => m.role === 'assistant')?.id
 
   return (
     <div className={styles.list}>
@@ -140,7 +169,13 @@ export function ChatMessages({ messages, loading, thinkingSteps, onFeedback }: C
             <div className={styles.userBubble}>{msg.content}</div>
           </div>
         ) : (
-          <AssistantMessage key={msg.id} msg={msg} onFeedback={onFeedback} />
+          <AssistantMessage
+            key={msg.id}
+            msg={msg}
+            showFollowUps={!loading && msg.id === lastAssistantId}
+            onFeedback={onFeedback}
+            onFollowUp={onFollowUp}
+          />
         )
       )}
 
