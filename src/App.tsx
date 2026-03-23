@@ -4,9 +4,142 @@ import { useState } from 'react'
 import { Icon } from './components'
 import { HavenWindow } from './features/Haven/HavenWindow'
 
-const MEMBERS = [
-  { id: 'AH0000007', mockId: 'AH0000007', name: 'Henry Tom Garcia', phone: '909-851-3064', pcp: 'Ambetter', dob: '01/01/2001', display: 'Henry Tom Garc' },
-  { id: 'AH0000023', mockId: 'AH0000023', name: 'Lisa Thompson',    phone: '703-442-8817', pcp: 'UnitedHealthcare', dob: '03/15/1966', display: 'Lisa Thompson' },
+interface MemberProfile {
+  id: string
+  mockId: string
+  display: string
+  name: string
+  phone: string
+  pcp: string
+  // Banner
+  bannerName: string
+  dob: string
+  age: string
+  alerts: Array<{ icon: 'Warning' | 'PanTool' | 'Info'; label: string; style?: string }>
+  // Personal Details card
+  personal: Array<[string, string]>
+  // Languages card
+  languages: Array<[string, string]>
+  // Phone Numbers card
+  phones: Array<[string, string]>
+  // Address card
+  address: Array<[string, string]>
+  // Medical IDs card
+  medicalIds: Array<[string, string]>
+}
+
+const MEMBERS: MemberProfile[] = [
+  {
+    id: 'AH0000007',
+    mockId: 'AH0000007',
+    display: 'Henry Tom Garc',
+    name: 'Henry Tom Garcia',
+    phone: '909-851-3064',
+    pcp: 'Ambetter',
+    bannerName: 'Henry Tom Garcia-AH0000007',
+    dob: '01/01/2001',
+    age: '24 yr(s)',
+    alerts: [
+      { icon: 'Warning',  label: 'Currently accessed by another care staff' },
+      { icon: 'Warning',  label: 'Service Interruption' },
+      { icon: 'PanTool', label: 'Life Threatening Allergies', style: 'he-banner-allergy' },
+    ],
+    personal: [
+      ['Member Name (F-M-L)', 'Henry Tom Garcia'],
+      ['Preferred Name',       'Preferred Name xbeew'],
+      ['Gender',               'Male'],
+      ['Gender Identity',      'Male'],
+      ['Sexual Orientation',   'Not Available'],
+      ['Preferred Pronouns',   'He/him/his'],
+      ['Date of Birth',        'January 01, 2001'],
+      ['New ID',               'AH0000007'],
+      ['Member ID',            'AH0000007'],
+      ['Preferred Contact Format', 'Not Available'],
+      ['Service Interruption', 'blood test, Nursing Home, demo'],
+    ],
+    languages: [
+      ['Primary Language',            'English'],
+      ['Preferred Written Language(s)', 'Spanish'],
+      ['Preferred Spoken Language(s)', 'English'],
+      ['Communication Impairment',    'Visually Impaired, Large Font, Hard of Hearing, Illiterate, Interpreter Needed, Braille Needed, Deaf, Aphasic'],
+    ],
+    phones: [
+      ['Preferred Phone',      '909-851-3064'],
+      ['Primary Phone',        '259-391-3698'],
+      ['Cell Phone',           '111-111-1111'],
+      ['Alternate Phone',      '909-851-3064'],
+      ['Fax',                  '233-366-6778'],
+      ['Preferred Time to Call', 'M-F 12pm–1pm'],
+    ],
+    address: [
+      ['Address',             'Address gikmt'],
+      ['City',                'CityEfdpM'],
+      ['State / Province',    'VA'],
+      ['Zip / Postal Code',   '20191'],
+      ['County',              'ADA COUNTY'],
+      ['Country',             'Not Available'],
+    ],
+    medicalIds: [
+      ['Primary Insurance',     'Not Available'],
+      ['Primary Ins. Policy #', 'XvAicS'],
+      ['Secondary Insurance',   'Medicaid'],
+      ['Secondary Ins. Policy #', '987676E2'],
+    ],
+  },
+  {
+    id: 'AH0000023',
+    mockId: 'AH0000023',
+    display: 'Lisa Thompson',
+    name: 'Lisa Thompson',
+    phone: '703-442-8817',
+    pcp: 'UnitedHealthcare',
+    bannerName: 'Lisa Anne Thompson-AH0000023',
+    dob: '03/15/1966',
+    age: '59 yr(s)',
+    alerts: [
+      { icon: 'Warning', label: 'Hard of Hearing — speak clearly, confirm understanding' },
+      { icon: 'Warning', label: 'CHF Alert — monitor for fluid retention and weight gain' },
+    ],
+    personal: [
+      ['Member Name (F-M-L)', 'Lisa Anne Thompson'],
+      ['Preferred Name',       'Lisa'],
+      ['Gender',               'Female'],
+      ['Gender Identity',      'Female'],
+      ['Sexual Orientation',   'Not Available'],
+      ['Preferred Pronouns',   'She/her/hers'],
+      ['Date of Birth',        'March 15, 1966'],
+      ['New ID',               'AH0000023'],
+      ['Member ID',            'AH0000023'],
+      ['Preferred Contact Format', 'Phone'],
+      ['Service Interruption', 'None'],
+    ],
+    languages: [
+      ['Primary Language',            'English'],
+      ['Preferred Written Language(s)', 'English'],
+      ['Preferred Spoken Language(s)', 'English'],
+      ['Communication Impairment',    'Hard of Hearing'],
+    ],
+    phones: [
+      ['Preferred Phone',      '703-442-8817'],
+      ['Cell Phone',           '703-558-2291'],
+      ['Alternate Phone',      '571-331-0044'],
+      ['Preferred Time to Call', 'M-F 9am–11am'],
+    ],
+    address: [
+      ['Address',             '892 Birchwood Lane'],
+      ['City',                'Alexandria'],
+      ['State / Province',    'VA'],
+      ['Zip / Postal Code',   '22301'],
+      ['County',              'FAIRFAX COUNTY'],
+      ['Country',             'United States'],
+    ],
+    medicalIds: [
+      ['Primary Insurance',     'UnitedHealthcare Medicare Advantage'],
+      ['Medicare ID',           'MCR-LT-2024-023'],
+      ['Secondary Insurance',   'Medicaid (DSNP)'],
+      ['Medicaid No.',          'MCD-22301-LT023'],
+    ],
+  },
 ]
 
 /* ─── Mock HealthEdge shell ─────────────────────────────────────────────── */
@@ -69,23 +202,24 @@ function NavBar({ activeMemberId, onMemberChange }: { activeMemberId: string; on
   )
 }
 
-function MemberBanner() {
+function MemberBanner({ profile }: { profile: MemberProfile }) {
   return (
     <div className="he-banner">
       <span className="he-banner-dot" />
-      <strong>Henry Tom Garcia-AH0000007</strong>
-      <span className="he-banner-meta">DOB 01/01/2001 · 24 yr(s)</span>
-      <span className="he-banner-alert"><Icon name="Warning" size="sm" /> Currently accessed by another care staff</span>
-      <span className="he-banner-alert"><Icon name="Warning" size="sm" /> Service Interruption</span>
-      <span className="he-banner-alert he-banner-allergy"><Icon name="PanTool" size="sm" /> Life Threatening Allergies</span>
+      <strong>{profile.bannerName}</strong>
+      <span className="he-banner-meta">DOB {profile.dob} · {profile.age}</span>
+      {profile.alerts.map(a => (
+        <span key={a.label} className={`he-banner-alert${a.style ? ` ${a.style}` : ''}`}>
+          <Icon name={a.icon} size="sm" /> {a.label}
+        </span>
+      ))}
     </div>
   )
 }
 
-function MemberDetails() {
+function MemberDetails({ profile }: { profile: MemberProfile }) {
   return (
     <div className="he-content">
-      {/* Tabs */}
       <div className="he-tabs">
         {['Member Details', 'Caregivers', 'Care Team', 'Programs', 'Eligibility', 'UDT'].map((t, i) => (
           <button key={t} className={`he-tab ${i === 0 ? 'he-tab-active' : ''}`}>{t}</button>
@@ -93,22 +227,9 @@ function MemberDetails() {
       </div>
 
       <div className="he-grid">
-        {/* Personal Details */}
         <div className="he-card he-card-wide">
           <h3 className="he-card-title">Personal Details</h3>
-          {[
-            ['Member Name (F-M-L)', 'Henry Tom Garcia'],
-            ['Preferred Name', 'Preferred Name xbeew'],
-            ['Gender', 'Male'],
-            ['Gender Identity', 'Male'],
-            ['Sexual Orientation', 'Not Available'],
-            ['Preferred Pronouns', 'He/him/his'],
-            ['Date of Birth', 'January 01, 2001'],
-            ['New ID', 'AH0000007'],
-            ['Member ID', 'AH0000007'],
-            ['Preferred Contact Format', 'Not Available'],
-            ['Service Interruption', 'blood test, Nursing Home, demo'],
-          ].map(([k, v]) => (
+          {profile.personal.map(([k, v]) => (
             <div className="he-field" key={k}>
               <span className="he-field-label">{k}:</span>
               <span className="he-field-value">{v}</span>
@@ -116,15 +237,9 @@ function MemberDetails() {
           ))}
         </div>
 
-        {/* Languages */}
         <div className="he-card">
           <h3 className="he-card-title">Languages</h3>
-          {[
-            ['Primary Language', 'English'],
-            ['Preferred Written Language(s)', 'Spanish'],
-            ['Preferred Spoken Language(s)', 'English'],
-            ['Communication Impairment', 'Visually Impaired, Large Font, Hard of Hearing, Illiterate, Interpreter Needed, Braille Needed, Deaf, Aphasic'],
-          ].map(([k, v]) => (
+          {profile.languages.map(([k, v]) => (
             <div className="he-field" key={k}>
               <span className="he-field-label">{k}:</span>
               <span className="he-field-value">{v}</span>
@@ -132,17 +247,9 @@ function MemberDetails() {
           ))}
         </div>
 
-        {/* Phone Numbers */}
         <div className="he-card he-card-wide">
           <h3 className="he-card-title">Phone Numbers</h3>
-          {[
-            ['Preferred Phone', '909-851-3064'],
-            ['Primary Phone', '259-391-3698'],
-            ['Cell Phone', '111-111-1111'],
-            ['Alternate Phone', '909-851-3064'],
-            ['Fax', '233-366-6778'],
-            ['Preferred Time to Call', 'M-F 12pm-1pm'],
-          ].map(([k, v]) => (
+          {profile.phones.map(([k, v]) => (
             <div className="he-field" key={k}>
               <span className="he-field-label">{k}:</span>
               <span className="he-field-value he-link">{v}</span>
@@ -150,17 +257,9 @@ function MemberDetails() {
           ))}
         </div>
 
-        {/* Address */}
         <div className="he-card">
           <h3 className="he-card-title">Address</h3>
-          {[
-            ['Address', 'Address gikmt'],
-            ['City', 'CityEfdpM'],
-            ['State / Province', 'VA'],
-            ['Zip / Postal Code', '20191'],
-            ['County', 'ADA COUNTY'],
-            ['Country', 'Not Available'],
-          ].map(([k, v]) => (
+          {profile.address.map(([k, v]) => (
             <div className="he-field" key={k}>
               <span className="he-field-label">{k}:</span>
               <span className="he-field-value">{v}</span>
@@ -168,15 +267,9 @@ function MemberDetails() {
           ))}
         </div>
 
-        {/* Medical IDs */}
         <div className="he-card">
           <h3 className="he-card-title">Medical IDs</h3>
-          {[
-            ['Primary Insurance', 'Not Available'],
-            ['Primary Ins. Policy #', 'XvAicS'],
-            ['Secondary Insurance', 'Medicaid'],
-            ['Secondary Ins. Policy #', '987676E2'],
-          ].map(([k, v]) => (
+          {profile.medicalIds.map(([k, v]) => (
             <div className="he-field" key={k}>
               <span className="he-field-label">{k}:</span>
               <span className="he-field-value">{v}</span>
@@ -196,7 +289,7 @@ export default function App() {
     <div className="he-shell">
       <TopBar />
       <NavBar activeMemberId={activeMemberId} onMemberChange={setActiveMemberId} />
-      <MemberBanner />
+      <MemberBanner profile={member} />
       <div className="he-body">
         <div className="he-sidebar">
           {([
@@ -213,7 +306,7 @@ export default function App() {
             </button>
           ))}
         </div>
-        <MemberDetails />
+        <MemberDetails profile={member} />
       </div>
 
       {/* ── Haven AI floating window + FAB ── */}
