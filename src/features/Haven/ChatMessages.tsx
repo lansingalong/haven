@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '@/components/Icons'
+import thumbUp from '@/assets/thumb_up.png'
+import thumbUpFill from '@/assets/thumb_up_fill.png'
 import styles from './ChatMessages.module.css'
 
 export interface Message {
@@ -135,7 +137,7 @@ function AssistantMessage({
           aria-label="Helpful"
           title="Helpful"
         >
-          <Icon name={msg.feedback === 'up' ? 'ThumbUp' : 'ThumbUpOffAlt'} size="xs" color="action" />
+          <img src={msg.feedback === 'up' ? thumbUpFill : thumbUp} width={16} height={16} alt="" aria-hidden="true" />
         </button>
         <button
           className={`${styles.actionBtn} ${msg.feedback === 'down' ? styles.actionBtnActive : ''}`}
