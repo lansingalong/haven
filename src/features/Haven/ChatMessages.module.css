@@ -127,10 +127,9 @@
 .followUpText {
   margin: 8px 0 2px;
   font-family: var(--font-family-base);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-regular);
-  color: var(--color-text-secondary);
-  font-style: italic;
+  color: var(--color-text-primary);
   line-height: var(--line-height-body);
 }
 

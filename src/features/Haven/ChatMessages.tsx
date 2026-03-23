@@ -15,6 +15,7 @@ export interface Message {
   isError?: boolean
   feedback?: 'up' | 'down' | null
   followUp?: string
+  followUpQuery?: string
 }
 
 export interface ChatMessagesProps {

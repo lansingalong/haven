@@ -7,7 +7,7 @@ import { ChatMessages, type Message } from './ChatMessages'
 import { AskHavenInput } from './AskHavenInput'
 import styles from './HavenWindow.module.css'
 import panelStyles from './HavenPanel.module.css'
-import { getMockReply, getFollowUp } from './mockReplies'
+import { getMockReply, getFollowUp, getFollowUpQuery } from './mockReplies'
 
 export interface HavenWindowProps {
   memberName?: string
@@ -149,6 +149,13 @@ export function HavenWindow({
     const trimmed = text.trim()
     if (!trimmed || loading) return
 
+    // If user says "yes", resolve against the last assistant message's follow-up query
+    const isYes = /^yes[.!]?\s*$/i.test(trimmed)
+    const lastFollowUpQuery = isYes
+      ? [...messages].reverse().find(m => m.role === 'assistant' && m.followUpQuery)?.followUpQuery
+      : undefined
+    const resolvedText = lastFollowUpQuery ?? trimmed
+
     const userMsg: Message = { id: `u-${Date.now()}`, role: 'user', content: trimmed }
     setMessages(prev => [...prev, userMsg])
     setMenuOpen(false)
@@ -158,16 +165,17 @@ export function HavenWindow({
     try {
       let reply: string
       if (onSend) {
-        reply = await onSend(trimmed)
+        reply = await onSend(resolvedText)
       } else {
         await new Promise(r => setTimeout(r, 1000 + Math.random() * 800))
-        reply = getMockReply(trimmed, memberName, mockMemberId)
+        reply = getMockReply(resolvedText, memberName, mockMemberId)
       }
       setMessages(prev => [...prev, {
         id: `a-${Date.now()}`,
         role: 'assistant',
         content: reply,
-        followUp: getFollowUp(trimmed),
+        followUp: getFollowUp(resolvedText),
+        followUpQuery: getFollowUpQuery(resolvedText),
       }])
     } finally {
       setLoading(false)

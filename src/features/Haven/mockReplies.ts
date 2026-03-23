@@ -490,28 +490,37 @@ const HEALTH_INDICATOR_TERMS = [
 
 /* ─── Follow-up suggestions ─────────────────────────────────────────────────── */
 
+const FOLLOW_UP_MAP: Array<{ terms: string[]; text: string; query: string }> = [
+  { terms: RISK_TERMS,             text: "Would you like to see the member's last recorded health indicators?",        query: "What is this member's last recorded health indicator?" },
+  { terms: HEALTH_INDICATOR_TERMS, text: "Would you like to see the member's current risk level?",                    query: "What is this member's current risk level?" },
+  { terms: ALLERGY_TERMS,          text: "Would you like to review the current medication list for contraindications?", query: "What is this member's current medication list?" },
+  { terms: VITAL_TERMS,            text: "Would you like to see the most recent lab results?",                         query: "What are the member's most recent lab results?" },
+  { terms: LAB_TERMS,              text: "Would you like to see the open care gaps related to these values?",          query: "What are the member's open care gaps?" },
+  { terms: MED_TERMS,              text: "Would you like to check for any drug allergies?",                            query: "Does the member have any drug allergies?" },
+  { terms: BEHAVIORAL_HEALTH_TERMS,text: "Would you like to see the behavioral health goals in the care plan?",        query: "What is the member's care plan?" },
+  { terms: SDOH_TERMS,             text: "Would you like to see what programs the member is eligible for?",            query: "What services is this member eligible for?" },
+  { terms: IMMUNIZATION_TERMS,     text: "Would you like to see the member's open care gaps?",                         query: "What are the member's open care gaps?" },
+  { terms: CARE_GAP_TERMS,         text: "Would you like to see the current care plan?",                               query: "What is the member's care plan?" },
+  { terms: ASSESSMENT_TERMS,       text: "Would you like to see the open care gaps?",                                  query: "What are the member's open care gaps?" },
+  { terms: CARE_PLAN_TERMS,        text: "Would you like to see what programs the member is enrolled in?",             query: "What programs is the member enrolled in?" },
+  { terms: PROGRAM_TERMS,          text: "Would you like to see the open care gaps?",                                  query: "What are the member's open care gaps?" },
+  { terms: VISIT_TERMS,            text: "Would you like to see the member's active care plan?",                       query: "What is the member's care plan?" },
+  { terms: ELIGIBILITY_TERMS,      text: "Would you like to see what programs the member is eligible for?",            query: "What services is this member eligible for?" },
+  { terms: CONTACT_TERMS,          text: "Would you like to see the member's full eligibility information?",           query: "What is this member's eligibility?" },
+  { terms: DIAGNOSIS_TERMS,        text: "Would you like to see the care plan goals for these conditions?",            query: "What is the member's care plan?" },
+  { terms: MEMBER_DETAIL_TERMS,    text: "Would you like to see the member's insurance and eligibility?",              query: "What is this member's eligibility?" },
+]
+
+const DEFAULT_FOLLOW_UP = { text: "Would you like to see the member's open care gaps?", query: "What are the member's open care gaps?" }
+
 export function getFollowUp(input: string): string {
   const q = input.toLowerCase()
+  return FOLLOW_UP_MAP.find(m => matches(q, m.terms))?.text ?? DEFAULT_FOLLOW_UP.text
+}
 
-  if (matches(q, RISK_TERMS))              return "Would you like to see the member's last recorded health indicators?"
-  if (matches(q, HEALTH_INDICATOR_TERMS))  return "Would you like to see the member's current risk level?"
-  if (matches(q, ALLERGY_TERMS))         return "Would you like to review the current medication list for contraindications?"
-  if (matches(q, VITAL_TERMS))           return "Would you like to see the most recent lab results?"
-  if (matches(q, LAB_TERMS))             return "Would you like to see the open care gaps related to these values?"
-  if (matches(q, MED_TERMS))             return "Would you like to check for any drug allergies?"
-  if (matches(q, BEHAVIORAL_HEALTH_TERMS)) return "Would you like to see the behavioral health goals in the care plan?"
-  if (matches(q, SDOH_TERMS))            return "Would you like to see what programs the member is eligible for?"
-  if (matches(q, IMMUNIZATION_TERMS))    return "Would you like to see the member's open care gaps?"
-  if (matches(q, CARE_GAP_TERMS))        return "Would you like to see the current care plan?"
-  if (matches(q, ASSESSMENT_TERMS))      return "Would you like to see the open care gaps?"
-  if (matches(q, CARE_PLAN_TERMS))       return "Would you like to see what programs the member is enrolled in?"
-  if (matches(q, PROGRAM_TERMS))         return "Would you like to see the open care gaps?"
-  if (matches(q, VISIT_TERMS))           return "Would you like to see the member's active care plan?"
-  if (matches(q, ELIGIBILITY_TERMS))     return "Would you like to see what programs the member is eligible for?"
-  if (matches(q, CONTACT_TERMS))         return "Would you like to see the member's full eligibility information?"
-  if (matches(q, DIAGNOSIS_TERMS))       return "Would you like to see the care plan goals for these conditions?"
-  if (matches(q, MEMBER_DETAIL_TERMS))   return "Would you like to see the member's insurance and eligibility?"
-  return "Would you like to see the member's open care gaps?"
+export function getFollowUpQuery(input: string): string {
+  const q = input.toLowerCase()
+  return FOLLOW_UP_MAP.find(m => matches(q, m.terms))?.query ?? DEFAULT_FOLLOW_UP.query
 }
 
 /* ─── Topic matchers in priority order ──────────────────────────────────────
