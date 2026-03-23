@@ -7,7 +7,7 @@ import { ChatMessages, type Message } from './ChatMessages'
 import { AskHavenInput } from './AskHavenInput'
 import styles from './HavenWindow.module.css'
 import panelStyles from './HavenPanel.module.css'
-import { getMockReply, getFollowUps } from './mockReplies'
+import { getMockReply, getFollowUp } from './mockReplies'
 
 export interface HavenWindowProps {
   memberName?: string
@@ -167,7 +167,7 @@ export function HavenWindow({
         id: `a-${Date.now()}`,
         role: 'assistant',
         content: reply,
-        followUps: getFollowUps(trimmed),
+        followUp: getFollowUp(trimmed),
       }])
     } finally {
       setLoading(false)
@@ -303,7 +303,7 @@ export function HavenWindow({
             {/* Scroll area */}
             <div className={panelStyles.chatScroll}>
               {hasMessages ? (
-                <ChatMessages messages={messages} loading={loading} onFollowUp={sendMessage} />
+                <ChatMessages messages={messages} loading={loading} />
               ) : (
                 <div className={panelStyles.welcomeWrap}>
                   <ChatWelcome onMemberDetails={() => setMenuOpen(true)} />

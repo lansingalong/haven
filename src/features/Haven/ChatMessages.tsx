@@ -14,7 +14,7 @@ export interface Message {
   content: string
   isError?: boolean
   feedback?: 'up' | 'down' | null
-  followUps?: string[]
+  followUp?: string
 }
 
 export interface ChatMessagesProps {
@@ -24,7 +24,6 @@ export interface ChatMessagesProps {
   /** Show animated thinking steps before response */
   thinkingSteps?: string[] | null
   onFeedback?: (id: string, value: 'up' | 'down') => void
-  onFollowUp?: (text: string) => void
 }
 
 /* ── Thinking steps ── */
@@ -71,14 +70,12 @@ function TypingIndicator() {
 /* ── Assistant message with actions ── */
 function AssistantMessage({
   msg,
-  showFollowUps,
+  showFollowUp,
   onFeedback,
-  onFollowUp,
 }: {
   msg: Message
-  showFollowUps: boolean
+  showFollowUp: boolean
   onFeedback?: (id: string, value: 'up' | 'down') => void
-  onFollowUp?: (text: string) => void
 }) {
   const [copied, setCopied] = useState(false)
 
@@ -107,20 +104,8 @@ function AssistantMessage({
       <div className={styles.row}>
         <div className={styles.assistantBubble}>{msg.content}</div>
       </div>
-      {showFollowUps && msg.followUps && msg.followUps.length > 0 && (
-        <div className={styles.followUps}>
-          {msg.followUps.map(q => (
-            <button
-              key={q}
-              type="button"
-              className={styles.followUpChip}
-              onClick={() => onFollowUp?.(q)}
-            >
-              <Icon name="ArrowForward" size="xs" color="action" />
-              <span>{q}</span>
-            </button>
-          ))}
-        </div>
+      {showFollowUp && msg.followUp && (
+        <p className={styles.followUpText}>{msg.followUp}</p>
       )}
       <div className={styles.actions}>
         <button
@@ -158,7 +143,7 @@ function AssistantMessage({
 }
 
 /* ── Main component ── */
-export function ChatMessages({ messages, loading, thinkingSteps, onFeedback, onFollowUp }: ChatMessagesProps) {
+export function ChatMessages({ messages, loading, thinkingSteps, onFeedback }: ChatMessagesProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -178,9 +163,8 @@ export function ChatMessages({ messages, loading, thinkingSteps, onFeedback, onF
           <AssistantMessage
             key={msg.id}
             msg={msg}
-            showFollowUps={!loading && msg.id === lastAssistantId}
+            showFollowUp={!loading && msg.id === lastAssistantId}
             onFeedback={onFeedback}
-            onFollowUp={onFollowUp}
           />
         )
       )}

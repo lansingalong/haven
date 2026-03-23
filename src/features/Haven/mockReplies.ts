@@ -472,94 +472,26 @@ const MEMBER_DETAIL_TERMS = [
 
 /* ─── Follow-up suggestions ─────────────────────────────────────────────────── */
 
-export function getFollowUps(input: string): string[] {
+export function getFollowUp(input: string): string {
   const q = input.toLowerCase()
 
-  if (matches(q, ALLERGY_TERMS)) return [
-    "What medications is the member currently taking?",
-    "What are the member's active diagnoses?",
-    "When was the member's last PCP visit?",
-  ]
-  if (matches(q, VITAL_TERMS)) return [
-    "What are the member's most recent lab results?",
-    "When was the member's last visit?",
-    "What does the care plan say about blood pressure management?",
-  ]
-  if (matches(q, LAB_TERMS)) return [
-    "What medications is the member taking?",
-    "What are the open care gaps related to labs?",
-    "What is the A1C or glucose goal in the care plan?",
-  ]
-  if (matches(q, MED_TERMS)) return [
-    "Does the member have any drug allergies?",
-    "What are the member's open care gaps?",
-    "What does the care plan say?",
-  ]
-  if (matches(q, BEHAVIORAL_HEALTH_TERMS)) return [
-    "What medications is the member taking for behavioral health?",
-    "What are the open care gaps?",
-    "What is in the care plan for this member?",
-  ]
-  if (matches(q, SDOH_TERMS)) return [
-    "What programs is the member eligible for?",
-    "What barriers are documented in the care plan?",
-    "What is the member's contact preference?",
-  ]
-  if (matches(q, IMMUNIZATION_TERMS)) return [
-    "What are the member's open care gaps?",
-    "When was the member's last wellness visit?",
-    "What is the member's current medication list?",
-  ]
-  if (matches(q, CARE_GAP_TERMS)) return [
-    "What programs is the member enrolled in or eligible for?",
-    "What assessments have been completed?",
-    "What is the current care plan?",
-  ]
-  if (matches(q, ASSESSMENT_TERMS)) return [
-    "What are the member's open care gaps?",
-    "What is in the care plan?",
-    "What is the member's behavioral health status?",
-  ]
-  if (matches(q, CARE_PLAN_TERMS)) return [
-    "What are the open care gaps?",
-    "What programs is the member enrolled in?",
-    "What assessments have been completed recently?",
-  ]
-  if (matches(q, PROGRAM_TERMS)) return [
-    "What are the member's open care gaps?",
-    "What does the care plan include?",
-    "What assessments are pending or overdue?",
-  ]
-  if (matches(q, VISIT_TERMS)) return [
-    "What are the member's current diagnoses?",
-    "What is in the active care plan?",
-    "What medications is the member taking?",
-  ]
-  if (matches(q, ELIGIBILITY_TERMS)) return [
-    "What programs is the member eligible for?",
-    "What are the open care gaps?",
-    "What is the member's care manager information?",
-  ]
-  if (matches(q, CONTACT_TERMS)) return [
-    "What are the member's communication impairments?",
-    "What is the member's preferred language?",
-    "When was the last successful contact attempt?",
-  ]
-  if (matches(q, DIAGNOSIS_TERMS)) return [
-    "What medications is the member on for these conditions?",
-    "What are the open care gaps?",
-    "What is in the active care plan?",
-  ]
-  if (matches(q, MEMBER_DETAIL_TERMS)) return [
-    "What insurance does the member have?",
-    "What are the member's phone numbers?",
-    "Who is the assigned care manager?",
-  ]
-  return [
-    "What medications is the member taking?",
-    "What are the open care gaps?",
-    "What is in the care plan?",
-  ]
+  if (matches(q, ALLERGY_TERMS))         return "Would you like to review the current medication list for contraindications?"
+  if (matches(q, VITAL_TERMS))           return "Would you like to see the most recent lab results?"
+  if (matches(q, LAB_TERMS))             return "Would you like to see the open care gaps related to these values?"
+  if (matches(q, MED_TERMS))             return "Would you like to check for any drug allergies?"
+  if (matches(q, BEHAVIORAL_HEALTH_TERMS)) return "Would you like to see the behavioral health goals in the care plan?"
+  if (matches(q, SDOH_TERMS))            return "Would you like to see what programs the member is eligible for?"
+  if (matches(q, IMMUNIZATION_TERMS))    return "Would you like to see the member's open care gaps?"
+  if (matches(q, CARE_GAP_TERMS))        return "Would you like to see the current care plan?"
+  if (matches(q, ASSESSMENT_TERMS))      return "Would you like to see the open care gaps?"
+  if (matches(q, CARE_PLAN_TERMS))       return "Would you like to see what programs the member is enrolled in?"
+  if (matches(q, PROGRAM_TERMS))         return "Would you like to see the open care gaps?"
+  if (matches(q, VISIT_TERMS))           return "Would you like to see the member's active care plan?"
+  if (matches(q, ELIGIBILITY_TERMS))     return "Would you like to see what programs the member is eligible for?"
+  if (matches(q, CONTACT_TERMS))         return "Would you like to see the member's full eligibility information?"
+  if (matches(q, DIAGNOSIS_TERMS))       return "Would you like to see the care plan goals for these conditions?"
+  if (matches(q, MEMBER_DETAIL_TERMS))   return "Would you like to see the member's insurance and eligibility?"
+  return "Would you like to see the member's open care gaps?"
 }
 
 /* ─── Topic matchers in priority order ──────────────────────────────────────
