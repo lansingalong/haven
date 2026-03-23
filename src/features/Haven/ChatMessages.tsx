@@ -71,11 +71,9 @@ function TypingIndicator() {
 /* ── Assistant message with actions ── */
 function AssistantMessage({
   msg,
-  showFollowUp,
   onFeedback,
 }: {
   msg: Message
-  showFollowUp: boolean
   onFeedback?: (id: string, value: 'up' | 'down') => void
 }) {
   const [copied, setCopied] = useState(false)
@@ -105,7 +103,7 @@ function AssistantMessage({
       <div className={styles.row}>
         <div className={styles.assistantBubble}>{msg.content}</div>
       </div>
-      {showFollowUp && msg.followUp && (
+      {msg.followUp && (
         <p className={styles.followUpText}>{msg.followUp}</p>
       )}
       <div className={styles.actions}>
@@ -162,7 +160,6 @@ export function ChatMessages({ messages, loading, thinkingSteps, onFeedback }: C
           <AssistantMessage
             key={msg.id}
             msg={msg}
-            showFollowUp={!!msg.followUp}
             onFeedback={onFeedback}
           />
         )

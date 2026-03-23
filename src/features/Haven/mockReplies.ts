@@ -523,6 +523,130 @@ export function getFollowUpQuery(input: string): string {
   return FOLLOW_UP_MAP.find(m => matches(q, m.terms))?.query ?? DEFAULT_FOLLOW_UP.query
 }
 
+/* ─── Guardrails ─────────────────────────────────────────────────────────── */
+
+function suggest(s1: string, s2: string): string {
+  return `Here are some things I can help with: "${s1}", "${s2}"`
+}
+
+/**
+ * Returns a refusal message (one of four standard categories) if the query
+ * falls outside supported scope, or null if the query is safe to process.
+ *
+ * Categories:
+ *   1. MISSING DATA      — info not available in the system
+ *   2. PERMISSION ERROR  — data exists but access is restricted
+ *   3. CLINICAL QUESTION — requires clinical judgment
+ *   4. OUT OF SCOPE      — irrelevant or inappropriate
+ */
+export function getGuardrailMessage(input: string): string | null {
+  const q = input.toLowerCase()
+
+  // ── Category 3: Clinical question ────────────────────────────────────────
+  // Dosage evaluation: any quantity unit paired with a quality judgment
+  const DOSAGE_SIGNALS = [' mg', 'mcg', ' ml ', ' g of ', 'gram of', 'milligram', 'units of', ' iu ', 'dosage of', 'dose of']
+  const EVAL_SIGNALS   = [' good', ' safe', ' ok', ' okay', ' right', ' appropriate', ' correct', 'too much', 'too little', 'too high', 'too low', ' proper', ' normal for']
+  const hasDosage = DOSAGE_SIGNALS.some(t => q.includes(t))
+  const hasEval   = EVAL_SIGNALS.some(t => q.includes(t))
+
+  const CLINICAL_DECISION_TERMS = [
+    'should he take', 'should she take', 'should the member take', 'should they take',
+    'can he take', 'can she take', 'should be taking',
+    'should he be on', 'should she be on', 'should the member be on',
+    'increase the dose', 'decrease the dose', 'adjust the dose',
+    'change his dose', 'change her dose', 'change the dose',
+    'add a medication', 'start taking', 'stop taking',
+    'change his medication', 'change her medication', 'change the medication',
+    'recommend treatment', 'treatment option', 'what treatment', 'best treatment',
+    'drug interaction', 'safe to take together',
+    'clinical recommendation', 'medical recommendation', 'clinical advice', 'medical advice',
+    'what dose should', 'what dosage should', 'right dose', 'correct dose', 'appropriate dose',
+    'is it safe to take', 'safe for him to take', 'safe for her to take',
+    'is this medication safe', 'is this drug safe',
+    'should i prescribe', 'should we prescribe', 'prescribe this',
+  ]
+
+  if ((hasDosage && hasEval) || CLINICAL_DECISION_TERMS.some(t => q.includes(t))) {
+    const base = "I'm not able to provide clinical advice. Please consult the member's care team or a licensed clinician for this question."
+    // Match follow-ups to what the user was trying to find out
+    if (q.includes('med') || q.includes('drug') || q.includes('prescri') || q.includes('rx') || hasDosage) {
+      return `${base}\n\n${suggest("What is this member's current medication list?", "Does this member have any documented drug allergies?")}`
+    }
+    if (q.includes('diagnos') || q.includes('condition') || q.includes('disease') || q.includes('disorder')) {
+      return `${base}\n\n${suggest("What are this member's active diagnoses?", "What is this member's care plan?")}`
+    }
+    return `${base}\n\n${suggest("What are this member's open care gaps?", "What is this member's active care plan?")}`
+  }
+
+  // ── Category 1: Missing data ──────────────────────────────────────────────
+  // Referral data is not available through this assistant
+  if (
+    q.includes('referral') &&
+    !q.includes('referral status') &&
+    !q.includes('referral history') &&
+    !q.includes('has a referral')
+  ) {
+    return `I can't provide that information at this time.\n\n${suggest("What services is this member eligible for?", "What programs is this member currently enrolled in?")}`
+  }
+
+  // ── Category 2: Permission error ──────────────────────────────────────────
+  // Prior authorization — write access not available
+  if (q.includes('prior auth')) {
+    return `It looks like you don't have access to this information at this time. Contact your system administrator to change your permissions.\n\n${suggest("What is this member's current medication list?", "What are this member's active diagnoses?")}`
+  }
+
+  // Billing and claims — restricted to authorized roles
+  if (
+    q.includes('billing') ||
+    q.includes('insurance claim') ||
+    q.includes('file a claim') ||
+    q.includes('claims data') ||
+    q.includes('claims history') ||
+    q.includes('claims information')
+  ) {
+    return `It looks like you don't have access to this information at this time. Contact your system administrator to change your permissions.\n\n${suggest("What is this member's eligibility and coverage?", "What services is this member eligible for?")}`
+  }
+
+  // Write / modify / action requests — read-only role
+  const WRITE_TERMS = [
+    'schedule an appointment', 'book an appointment', 'make an appointment',
+    'cancel appointment', 'reschedule appointment',
+    'send a message to', 'send an email', 'send a letter', 'send notification', 'notify the member',
+    'update the record', 'update his record', 'update her record',
+    'modify the record', 'edit the record', 'change the record',
+    'update his address', 'update her address', 'change the address', 'change his address', 'change her address',
+    'delete the record', 'delete member', 'remove from record',
+    'enroll the member', 'enroll him', 'enroll her', 'unenroll',
+    'submit a claim', 'create a case', 'open a case', 'close a case',
+    'assign to a care', 'reassign the member',
+  ]
+  if (WRITE_TERMS.some(t => q.includes(t))) {
+    const isScheduling = ['schedule', 'book', 'appointment', 'reschedule', 'cancel'].some(t => q.includes(t))
+    if (isScheduling) {
+      return `It looks like you don't have access to this information at this time. Contact your system administrator to change your permissions.\n\n${suggest("What is this member's visit history?", "What is this member's active care plan?")}`
+    }
+    return `It looks like you don't have access to this information at this time. Contact your system administrator to change your permissions.\n\n${suggest("What is this member's current risk level?", "What are this member's open care gaps?")}`
+  }
+
+  // ── Category 4: Out of scope / inappropriate ──────────────────────────────
+  const LEGAL_TERMS = [
+    'lawsuit', 'legal action', 'legal advice', 'malpractice',
+    'liable', 'liability', ' attorney', ' lawyer', 'litigation', 'legal counsel',
+    'file a complaint', 'hipaa violation', 'compliance violation', 'legal question',
+    'suing', ' sue ',
+  ]
+  if (LEGAL_TERMS.some(t => q.includes(t))) {
+    return `I can't provide you with that kind of information.\n\n${suggest("What are this member's open care gaps?", "What is this member's active care plan?")}`
+  }
+
+  const ADMIN_TERMS = ['password', 'system admin', 'admin account', 'confidential data', 'restrict access', 'reset credentials']
+  if (ADMIN_TERMS.some(t => q.includes(t))) {
+    return `I can't provide you with that kind of information.\n\n${suggest("What is this member's current risk level?", "What programs is this member eligible for?")}`
+  }
+
+  return null
+}
+
 /* ─── Topic matchers in priority order ──────────────────────────────────────
    Order matters — more specific topics (allergies, vitals, labs) are checked
    before broad ones (diagnoses) to avoid false positives.

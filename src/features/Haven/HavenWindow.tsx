@@ -7,7 +7,7 @@ import { ChatMessages, type Message } from './ChatMessages'
 import { AskHavenInput } from './AskHavenInput'
 import styles from './HavenWindow.module.css'
 import panelStyles from './HavenPanel.module.css'
-import { getMockReply, getFollowUp, getFollowUpQuery } from './mockReplies'
+import { getMockReply, getFollowUp, getFollowUpQuery, getGuardrailMessage } from './mockReplies'
 
 export interface HavenWindowProps {
   memberName?: string
@@ -30,74 +30,6 @@ type ResizeDir = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw'
 
 const MIN_W = 360
 const MIN_H = 300
-
-/* ── Query categorization ── */
-type QueryType = 'large' | 'short' | 'error'
-
-const LARGE_KEYWORDS = ['history', 'summary', 'summarize', 'all', 'full', 'complete', 'everything', 'overview', 'records', 'lab', 'diagnos', 'condition', 'care plan', 'sdoh', 'social', 'immuniz', 'program']
-const ERROR_KEYWORDS = ['referral', 'prior auth', 'authorization', 'restrict', 'confidential', 'delete', 'override', 'admin', 'password', 'billing', 'claim']
-
-const THINKING_STEPS: Record<string, string[]> = {
-  large: [
-    'Scanning member health records…',
-    'Retrieving clinical data…',
-    'Cross-referencing care history…',
-    'Compiling summary…',
-  ],
-  labs: [
-    'Connecting to laboratory system…',
-    'Retrieving result panels…',
-    'Checking reference ranges…',
-    'Flagging abnormal values…',
-  ],
-  careplan: [
-    'Loading active care plan…',
-    'Reviewing open goals…',
-    'Checking intervention status…',
-  ],
-  sdoh: [
-    'Retrieving SDOH screening data…',
-    'Checking community referral status…',
-    'Reviewing social risk factors…',
-  ],
-}
-
-function getQueryMeta(input: string): { type: QueryType; steps: string[] | null; delay: number } {
-  const q = input.toLowerCase()
-
-  if (ERROR_KEYWORDS.some(k => q.includes(k))) {
-    return { type: 'error', steps: null, delay: 900 }
-  }
-  if (q.includes('lab') || q.includes('result') || q.includes('a1c') || q.includes('cholesterol')) {
-    return { type: 'large', steps: THINKING_STEPS.labs, delay: 600 }
-  }
-  if (q.includes('care plan') || q.includes('goal') || q.includes('intervention')) {
-    return { type: 'large', steps: THINKING_STEPS.careplan, delay: 600 }
-  }
-  if (q.includes('social') || q.includes('sdoh') || q.includes('housing') || q.includes('food')) {
-    return { type: 'large', steps: THINKING_STEPS.sdoh, delay: 600 }
-  }
-  if (LARGE_KEYWORDS.some(k => q.includes(k))) {
-    return { type: 'large', steps: THINKING_STEPS.large, delay: 600 }
-  }
-  // Short: simple factual lookups
-  return { type: 'short', steps: null, delay: 550 }
-}
-
-function getErrorMessage(input: string): string {
-  const q = input.toLowerCase()
-  if (q.includes('referral')) {
-    return 'Referral submissions must be completed through the HealthEdge Referral module. I\'m not able to initiate or submit referrals directly. Please navigate to Actions → New Referral to proceed.'
-  }
-  if (q.includes('prior auth') || q.includes('authorization')) {
-    return 'Prior authorization requests require access to the PA workflow in HealthEdge. I don\'t have write access to submit PA requests. Please use Actions → Prior Authorization.'
-  }
-  if (q.includes('billing') || q.includes('claim')) {
-    return 'Billing and claims data is restricted to authorized billing staff. I\'m not able to display financial or claims information in this session.'
-  }
-  return 'I wasn\'t able to complete this request. This action may require elevated permissions, or the data may be temporarily unavailable. Please try again or contact your system administrator.'
-}
-
 
 export function HavenWindow({
   memberName = 'Henry Tom Garcia',
@@ -163,6 +95,18 @@ export function HavenWindow({
     setLoading(true)
 
     try {
+      // Check guardrails before any backend call
+      const guardrail = getGuardrailMessage(resolvedText)
+      if (guardrail) {
+        await new Promise(r => setTimeout(r, 600))
+        setMessages(prev => [...prev, {
+          id: `a-${Date.now()}`,
+          role: 'assistant',
+          content: guardrail,
+        }])
+        return
+      }
+
       let reply: string
       if (onSend) {
         reply = await onSend(resolvedText)
@@ -180,7 +124,7 @@ export function HavenWindow({
     } finally {
       setLoading(false)
     }
-  }, [loading, memberName, onSend])
+  }, [loading, memberName, onSend, messages])
 
   /* ── Drag ── */
   const dragState = useRef<{ startX: number; startY: number; startLeft: number; startTop: number } | null>(null)
