@@ -1,0 +1,35 @@
+/* Haven — MemberHeader */
+.root {
+  background: var(--color-bg-sky);
+  border-bottom: 1px solid var(--color-sky-border);
+  padding: 16px 15px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+/* Row 1 */
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-bottom: 28px;
+}
+
+/* Row 2 */
+.fieldsRow {
+  display: flex;
+  gap: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.field:not(:last-child) {
+  padding-right: var(--spacing-4);
+}

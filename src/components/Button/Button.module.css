@@ -1,0 +1,190 @@
+/* Quill — Button */
+
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-md);
+  letter-spacing: 0.02857em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--transition-fast),
+              border-color var(--transition-fast),
+              color var(--transition-fast),
+              box-shadow var(--transition-fast);
+  text-decoration: none;
+  user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* ── Size ── */
+.small {
+  padding: 4px 10px;
+  font-size: var(--font-size-sm);
+}
+
+.medium {
+  padding: 6px 16px;
+}
+
+.large {
+  padding: 8px 22px;
+  font-size: var(--font-size-xl);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* ── Variant: contained ── */
+.contained.primary {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-2);
+}
+
+.contained.primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-4);
+}
+
+.contained.primary:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.contained.primary:active:not(:disabled) {
+  box-shadow: var(--shadow-1);
+}
+
+.contained.error {
+  background: var(--color-error);
+  color: var(--color-text-inverse);
+  border-color: var(--color-error);
+  box-shadow: var(--shadow-2);
+}
+
+.contained.error:hover:not(:disabled) {
+  background: #b71c1c;
+  border-color: #b71c1c;
+  box-shadow: var(--shadow-4);
+}
+
+/* ── Variant: outlined ── */
+.outlined.primary {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.outlined.primary:hover:not(:disabled) {
+  background: var(--color-action-hover);
+}
+
+.outlined.primary:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.outlined.error {
+  background: transparent;
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+.outlined.error:hover:not(:disabled) {
+  background: var(--color-error-light);
+}
+
+/* ── Variant: text ── */
+.text.primary {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: transparent;
+}
+
+.text.primary:hover:not(:disabled) {
+  background: var(--color-action-hover);
+}
+
+.text.primary:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.text.error {
+  background: transparent;
+  color: var(--color-error);
+  border-color: transparent;
+}
+
+.text.error:hover:not(:disabled) {
+  background: var(--color-error-light);
+}
+
+/* ── Disabled ── */
+.root:disabled {
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.contained:disabled {
+  background: var(--color-action-disabled-bg);
+  color: var(--color-action-disabled);
+  border-color: transparent;
+}
+
+.outlined:disabled,
+.text:disabled {
+  color: var(--color-action-disabled);
+  border-color: var(--color-action-disabled-bg);
+}
+
+/* ── Icons ── */
+.startIcon,
+.endIcon {
+  display: inline-flex;
+  align-items: center;
+  font-size: 18px;
+}
+
+.small .startIcon,
+.small .endIcon {
+  font-size: 16px;
+}
+
+/* ── Loading ── */
+.loading {
+  cursor: default;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Label ── */
+.label {
+  display: inline-flex;
+  align-items: center;
+}
