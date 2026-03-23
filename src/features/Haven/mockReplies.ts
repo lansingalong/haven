@@ -550,6 +550,15 @@ export function getGuardrailMessage(input: string): string | null {
   const hasEval   = EVAL_SIGNALS.some(t => q.includes(t))
 
   const CLINICAL_DECISION_TERMS = [
+    // Evaluation of a specific medication or dosage
+    'good for him', 'good for her', 'good for the member',
+    'safe for him', 'safe for her', 'safe for the member',
+    'right for him', 'right for her', 'right for the member',
+    'okay for him', 'okay for her', 'ok for him', 'ok for her',
+    'appropriate for him', 'appropriate for her', 'appropriate for the member',
+    'is this safe', 'is that safe', 'is it safe',
+    'is this good', 'is that good',
+    // Prescribing / modification decisions
     'should he take', 'should she take', 'should the member take', 'should they take',
     'can he take', 'can she take', 'should be taking',
     'should he be on', 'should she be on', 'should the member be on',
