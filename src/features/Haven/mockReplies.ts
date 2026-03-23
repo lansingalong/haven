@@ -544,7 +544,7 @@ export function getGuardrailMessage(input: string): string | null {
 
   // ── Category 3: Clinical question ────────────────────────────────────────
   // Dosage evaluation: any quantity unit paired with a quality judgment
-  const DOSAGE_SIGNALS = [' mg', 'mcg', ' ml ', ' g of ', 'gram of', 'milligram', 'units of', ' iu ', 'dosage of', 'dose of']
+  const DOSAGE_SIGNALS = ['mg', 'mcg', 'ml', ' g of ', 'gram of', 'milligram', 'units of', ' iu ', 'dosage of', 'dose of']
   const EVAL_SIGNALS   = [' good', ' safe', ' ok', ' okay', ' right', ' appropriate', ' correct', 'too much', 'too little', 'too high', 'too low', ' proper', ' normal for']
   const hasDosage = DOSAGE_SIGNALS.some(t => q.includes(t))
   const hasEval   = EVAL_SIGNALS.some(t => q.includes(t))
