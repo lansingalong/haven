@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '@/components/Icons'
+import contentCopy from '@/assets/content_copy.png'
+import checkIcon from '@/assets/check.png'
 import thumbUp from '@/assets/thumb_up.png'
 import thumbUpFill from '@/assets/thumb_up_fill.png'
 import thumbDown from '@/assets/thumb_down.png'
@@ -83,7 +85,7 @@ function AssistantMessage({
   const handleCopy = () => {
     navigator.clipboard.writeText(msg.content)
     setCopied(true)
-    setTimeout(() => setCopied(false), 1800)
+    setTimeout(() => setCopied(false), 5000)
   }
 
   if (msg.isError) {
@@ -128,7 +130,7 @@ function AssistantMessage({
           aria-label="Copy response"
           title={copied ? 'Copied!' : 'Copy'}
         >
-          <Icon name={copied ? 'Check' : 'ContentCopy'} size="xs" color="action" />
+          <img src={copied ? checkIcon : contentCopy} width={16} height={16} alt="" aria-hidden="true" />
           <span>{copied ? 'Copied' : 'Copy'}</span>
         </button>
         <div className={styles.actionDivider} />
