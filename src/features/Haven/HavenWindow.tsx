@@ -279,9 +279,6 @@ export function HavenWindow({
           <button className={`${styles.trafficBtn} ${styles.btnMax}`}    onClick={handleMaximize} type="button" aria-label="Maximize"  title="Maximize"  />
         </div>
         <span className={styles.chromeTitle}>Haven</span>
-        <button className={styles.shareBtn} type="button" aria-label="Share">
-          <Icon name="IosShare" size="sm" color="action" />
-        </button>
       </div>
 
       {/* Window body */}
