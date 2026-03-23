@@ -151,8 +151,6 @@ export function ChatMessages({ messages, loading, thinkingSteps, onFeedback }: C
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading, thinkingSteps])
 
-  const lastAssistantId = [...messages].reverse().find(m => m.role === 'assistant')?.id
-
   return (
     <div className={styles.list}>
       {messages.map((msg) =>
@@ -164,7 +162,7 @@ export function ChatMessages({ messages, loading, thinkingSteps, onFeedback }: C
           <AssistantMessage
             key={msg.id}
             msg={msg}
-            showFollowUp={!loading && msg.id === lastAssistantId}
+            showFollowUp={!!msg.followUp}
             onFeedback={onFeedback}
           />
         )
